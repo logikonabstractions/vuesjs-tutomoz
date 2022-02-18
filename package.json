@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
-  "dependencies": {
+  "wedependencies": {
     "core-js": "^3.6.5",
     "lodash.uniqueid": "^4.0.1",
     "vue": "^2.6.11"

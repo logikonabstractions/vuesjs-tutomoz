@@ -1,29 +1,65 @@
 <template>
-  <div class="custom-checkbox">
-    <input type="checkbox" class="checkbox"  :id="id" :checked="isDone" />
-<!--    <label for="todo-item"> My TODO item </label>-->
-    <label class="checkbox-label" :for="id"> {{label}} {{id}}</label>
+  <div class="stack-small" v-if="!isEditing">
+    <div class="custom-checkbox">
+      <input type="checkbox" class="checkbox"  :id="id" :checked="isDone" @change="$emit('checkbox-changed')" />
+      <label class="checkbox-label" :for="id"> {{label}} {{id}}</label>
+    </div>
+    <div class="btn-group">
+      <button class="btn" type="button" @click="toggleToDoItemEditForm" >
+        Edit <span class="visually-hidden">{{label}}</span>
+      </button>
+      <button class="btn btn__danger" @click="deleteToDo">
+        Delete <span class="visually-hidden">{{label}}</span>
+      </button>
+    </div>
   </div>
+  <to-do-item-edit-form v-else :id="id" :label="label" @item-edited="itemEdited" @edit-cancelled="editCancelled">
+  </to-do-item-edit-form>
 </template>
 
 
 
 <script>
-// import uniqueId from 'lodash.uniqueid'
+import ToDoItemEditForm from "@/components/ToDoItemEditForm";
+
 export default {
   name: "ToDoItem",
+  components: {
+    ToDoItemEditForm
+  },
   props: {
     label: {required:true, type:String},
     done: {default: false, type:Boolean},
     id: {required: true, type:String}
   },
+  computed: {
+    isDone(){
+      return this.done
+    }
+  },
   // adds extra data, kind of like context["extras"] in django
   data() {
     return {
-      isDone: this.done,
-      // id: uniqueId('todo-')
+      // isDone: this.done,
+      isEditing: false
     }
-    // return {}
+  },
+  methods: {
+    toggleToDoItemEditForm(){
+      console.log("Editing todo " + this.id)
+      this.isEditing = true;
+    },
+    deleteToDo(){
+      console.log("Deleting todo " + this.id)
+      this.$emit("item-deleted")
+    },
+    itemEdited(newLabel){
+      this.$emit('item-edited', newLabel);
+      this.isEditing = false;
+    },
+    editCancelled(){
+      this.isEditing = false;
+    }
   }
 
 }

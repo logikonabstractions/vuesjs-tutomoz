@@ -1,13 +1,14 @@
 <template>
   <div id="app">
-<!--  <div id="">-->
     <h1>TODO list</h1>
-<!--    <to-do-form v-on="todo_added" ></to-do-form>-->
-<!--    <to-do-form @todo-added="addToDo"></to-do-form>-->
     <ToDoForm @todo-added="addToDo"></ToDoForm>
-    <ul class="stack-large">
+    <h2 id="list-summary">{{listSummary}}</h2>
+    <ul aria-labelledby="list-summary" class="stack-large">
       <li v-for="item in ToDoItems" :key="item.id">
-        <to-do-item :label="item.label" :done="item.done" id="item.id"></to-do-item>
+        <to-do-item :label="item.label" :done="item.done" :id="item.id" @checkbox-changed="updateDoneStatus(item.id)"
+                    @item-deleted="deleteToDo(item.id)"
+                    @item-edited="editToDo(item.id, $event)"
+        ></to-do-item>
       </li>
     </ul>
   </div>
@@ -40,6 +41,27 @@
         console.log('To-do added', toDoLabel);
         console.log(toDoLabel);
         this.ToDoItems.push({id:uniqueId('todo-'), label: toDoLabel, done: false})
+      },
+      updateDoneStatus(toDoId) {
+      // retrieve the object from that id from ToDoItems array here, and inverse it's bool (done/not done)
+        console.log("Update Done status: " + toDoId)
+        let toDoUpdate = this.ToDoItems.find(item => item.id === toDoId)
+        toDoUpdate.done = !toDoUpdate.done
+      },
+      deleteToDo(toDoId) {
+        console.log("app.vue deleteToDo: " + toDoId)
+        this.ToDoItems.splice(this.ToDoItems.findIndex(item => item.id === toDoId), 1);
+      },
+      editToDo(toDoId, newLabel){
+        console.log("app.vue editToDo: " + toDoId)
+        let toDoToEdit = this.ToDoItems.find(item => item.id === toDoId)
+        toDoToEdit.label = newLabel
+      }
+    },
+    computed: {
+      listSummary() {
+        const numberFinishedItems = this.ToDoItems.filter(item =>item.done).length
+        return `${numberFinishedItems} out of ${this.ToDoItems.length} items completed`
       }
     }
   }
